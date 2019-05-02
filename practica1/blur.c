@@ -29,14 +29,14 @@ typedef struct {
 } bitmap_header;
 #pragma pack(pop)
 
-int blur(char* input, char *output) {
+int blur(char* input, char *output, int kernel) {
 
   //variable dec:
   FILE *fp,*out;
   bitmap_header* hp;
   int n,x,xx,y,yy,ile, avgR,avgB,avgG,B,G,R;
   unsigned char *data;
-  int blurSize = 10;
+  int blurSize = kernel;
 
 
   //Open input file:
@@ -119,6 +119,15 @@ int blur(char* input, char *output) {
   return 0;
 }
 
-void main() {
-  blur("landscape.bmp", "landscape-blur.bmp");
+void main(int argc, char **argv) {
+  char* original = argv[1];
+  char* modified = argv[2];
+  int kernel =  atoi(argv[3]);
+  int threads = atoi(argv[4]);
+  if (kernel > 3 || kernel < 15) {
+    blur(original, modified, kernel);
+  }
+  else {
+    printf("Kernel outside limits [3, 15]");
+  }
 }
