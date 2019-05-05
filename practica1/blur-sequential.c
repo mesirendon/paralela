@@ -3,7 +3,6 @@
 #include <string.h>
 
 #pragma pack(push,1)
-/* Windows 3.x bitmap file header */
 typedef struct {
   char         filetype[2];   /* magic - always 'B' 'M' */
   unsigned int filesize;
@@ -12,7 +11,6 @@ typedef struct {
   unsigned int dataoffset;    /* offset in bytes to actual bitmap data */
 } file_header;
 
-/* Windows 3.x bitmap full header, including file header */
 typedef struct {
   file_header  fileheader;
   unsigned int headersize;
@@ -32,37 +30,37 @@ typedef struct {
 int blur(char* input, char *output, int kernel) {
 
   //variable dec:
-  FILE *fp,*out;
+  FILE *fp, *out;
   bitmap_header* hp;
-  int n,x,xx,y,yy,ile, avgR,avgB,avgG,B,G,R;
+  int n, x, xx, y, yy, ile, avgR, avgB, avgG, B, G, R;
   unsigned char *data;
   int blurSize = kernel;
 
 
   //Open input file:
   fp = fopen(input, "r");
-  if(fp==NULL){
+  if(fp == NULL){
     //cleanup
   }
 
   //Read the input file headers:
-  hp=(bitmap_header*)malloc(sizeof(bitmap_header));
-  if(hp==NULL)
+  hp = (bitmap_header*) malloc(sizeof(bitmap_header));
+  if(hp == NULL)
     return 3;
 
-  n=fread(hp, sizeof(bitmap_header), 1, fp);
-  if(n<1){
+  n = fread(hp, sizeof(bitmap_header), 1, fp);
+  if(n < 1){
     //cleanup
   }
   //Read the data of the image:
-  data = (char*)malloc(sizeof(char)*hp->bitmapsize);
-  if(data==NULL){
+  data = (char*) malloc(sizeof(char) * hp->bitmapsize);
+  if(data == NULL){
     //cleanup
   }
 
-  fseek(fp,sizeof(char)*hp->fileheader.dataoffset,SEEK_SET);
-  n=fread(data,sizeof(char),hp->bitmapsize, fp);
-  if(n<1){
+  fseek(fp, sizeof(char) * hp->fileheader.dataoffset, SEEK_SET);
+  n = fread(data, sizeof(char), hp->bitmapsize, fp);
+  if(n < 1){
     //cleanup
   }
 
@@ -98,17 +96,17 @@ int blur(char* input, char *output, int kernel) {
 
   //Open output file:
   out = fopen(output, "wb");
-  if(out==NULL){
+  if(out == NULL){
     //cleanup
   }
 
-  n=fwrite(hp,sizeof(char),sizeof(bitmap_header),out);
-  if(n<1){
+  n = fwrite(hp, sizeof(char), sizeof(bitmap_header), out);
+  if(n < 1){
     //cleanup
   }
-  fseek(out,sizeof(char)*hp->fileheader.dataoffset,SEEK_SET);
-  n=fwrite(data,sizeof(char),hp->bitmapsize,out);
-  if(n<1){
+  fseek(out, sizeof(char) * hp->fileheader.dataoffset, SEEK_SET);
+  n = fwrite(data, sizeof(char), hp->bitmapsize, out);
+  if(n < 1){
     //cleanup
   }
 
