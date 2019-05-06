@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <pthread.h>
+#include <errno.h>
 
 #pragma pack(push,1)
 typedef struct {
@@ -117,15 +120,37 @@ int blur(char* input, char *output, int kernel) {
   return 0;
 }
 
-void main(int argc, char **argv) {
+double time_spec_seconds(struct timespec* ts) {
+  return (double) ts->tv_sec + (double) ts->tv_nsec * 1.0e-9;
+}
+
+int main(int argc, char **argv) {
+  struct timespec tstart = {0,0}, tend = {0,0};
   char* original = argv[1];
   char* modified = argv[2];
   int kernel =  atoi(argv[3]);
   int threads = atoi(argv[4]);
-  if (kernel > 3 || kernel < 15) {
-    blur(original, modified, kernel);
-  }
+
+  if (kernel < 3 || kernel > 15)
+    printf("Invalid kernel value. Must be between [3, 15]");
   else {
-    printf("Kernel outside limits [3, 15]");
+    int r = clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &tstart);
+
+    if (r == -1) {
+      printf("The clock_gettime() function failed: %s\n", strerror(errno));
+      return 1;
+    }
+
+    blur(original, modified, kernel);
+
+    r = clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &tend);
+    if (r == -1) {
+      printf("The clock_gettime() function failed: %s\n", strerror(errno));
+      return 1;
+    }
+
+    double delta = time_spec_seconds(&tend) - time_spec_seconds(&tstart);
+
+    printf("%d\t%d\t%.4f\n", kernel, threads, delta);
   }
 }
