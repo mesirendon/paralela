@@ -117,8 +117,8 @@ int blur(char* input, char *output, int kernel, int threads) {
   for(i = 0; i < threads; i++) {
     thrdata[i].xmin = hp->width / threads * i;
     thrdata[i].xmax = hp->width / threads * (i + 1);
-    thrdata[i].ymin = hp->height / threads * i;
-    thrdata[i].ymax = hp->height / threads * (i + 1);
+    thrdata[i].ymin = 0;
+    thrdata[i].ymax = hp->height;
     thrdata[i].data = data;
     thrdata[i].blurSize = blurSize;
     thrdata[i].hp = hp;
@@ -169,7 +169,7 @@ int main(int argc, char **argv) {
   if (kernel < 3 || kernel > 15)
     printf("Invalid kernel value. Must be between [3, 15]");
   else {
-    int r = clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &tstart);
+    int r = clock_gettime(CLOCK_MONOTONIC, &tstart);
 
     if (r == -1) {
       printf("The clock_gettime() function failed: %s\n", strerror(errno));
@@ -178,7 +178,7 @@ int main(int argc, char **argv) {
 
     blur(original, modified, kernel, threads);
 
-    r = clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &tend);
+    r = clock_gettime(CLOCK_MONOTONIC, &tend);
     if (r == -1) {
       printf("The clock_gettime() function failed: %s\n", strerror(errno));
       return 1;
