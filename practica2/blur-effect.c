@@ -110,6 +110,8 @@ int blur(char* input, char *output, int kernel, int threads) {
     //cleanup
   }
 
+  printf("Bitmapsize: %d\n\n", hp->bitmapsize);
+
   fseek(fp, sizeof(char) * hp->fileheader.dataoffset, SEEK_SET);
   n = fread(data, sizeof(char), hp->bitmapsize, fp);
   if(n < 1){
